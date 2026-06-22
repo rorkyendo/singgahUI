@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { FaPaperPlane } from "react-icons/fa";
 import { useLanguage } from '../i18n';
@@ -14,33 +14,15 @@ const ChatWidget = ({ isOpen, name, phone, inputFrom, sessionId, sendTrigger, se
     const { t } = useLanguage();
     const { chatMessage } = useSelector((state) => state.chat);
     const [input, setInput] = useState(inputFrom);
-    const [sessId, setSessionId] = useState(sessionId);
     const [isTyping, setIsTyping] = useState(false);
     const dispatch = useDispatch();
     const messagesEndRef = useRef(null);
 
     useEffect(() => {
         if (inputFrom) setInput(inputFrom);
-        if (sessId) setSessionId(sessionId);
-    }, [inputFrom, sessionId]);
+    }, [inputFrom]);
 
-    useEffect(() => {
-        if (sendTrigger && input && input.trim() !== "") {
-            const timer = setTimeout(() => {
-                sendMessage();
-                setSendTrigger(false);
-            }, 100);
-            return () => clearTimeout(timer);
-        }
-    }, [sendTrigger, input, name, sessionId]);
-
-    useEffect(() => {
-        if (messagesEndRef.current) {
-            messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
-        }
-    }, [chatMessage, isTyping]);
-
-    const sendMessage = () => {
+    const sendMessage = useCallback(() => {
         if (!input || input.trim() === "") return;
 
         const userMsg = {
@@ -79,10 +61,10 @@ const ChatWidget = ({ isOpen, name, phone, inputFrom, sessionId, sendTrigger, se
                         is_product: response.is_product,
                         product: response.product || []
                     }));
-                    const currentMessages = Array.isArray(store.getState().chat.chatMessage)
+                    const latestMessages = Array.isArray(store.getState().chat.chatMessage)
                         ? store.getState().chat.chatMessage
                         : [];
-                    dispatch(setChatMessage([...currentMessages, ...newMessages]));
+                    dispatch(setChatMessage([...latestMessages, ...newMessages]));
                 }
             }, Math.max(800, response?.messages?.join(' ').length * 20 || 800));
         }).catch((error) => {
@@ -93,7 +75,23 @@ const ChatWidget = ({ isOpen, name, phone, inputFrom, sessionId, sendTrigger, se
         });
 
         setInput("");
-    };
+    }, [input, name, sessionId, chatMessage, dispatch, setIsTyping, setInput]);
+
+    useEffect(() => {
+        if (sendTrigger && input && input.trim() !== "") {
+            const timer = setTimeout(() => {
+                sendMessage();
+                setSendTrigger(false);
+            }, 100);
+            return () => clearTimeout(timer);
+        }
+    }, [sendTrigger, input, name, sessionId, sendMessage, setSendTrigger]);
+
+    useEffect(() => {
+        if (messagesEndRef.current) {
+            messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+        }
+    }, [chatMessage, isTyping]);
 
     if (!isOpen) return null;
 
