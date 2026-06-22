@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { FaPaperPlane } from "react-icons/fa";
+import { useLanguage } from '../i18n';
 import { sendChat } from "../api/chat";
 import { useDispatch } from 'react-redux';
 import { setChatMessage } from '../store/chatSlice';
@@ -10,6 +11,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import '@fontsource/rubik';
 
 const ChatWidget = ({ isOpen, name, phone, inputFrom, sessionId, sendTrigger, setSendTrigger }) => {
+    const { t } = useLanguage();
     const { chatMessage } = useSelector((state) => state.chat);
     const [input, setInput] = useState(inputFrom);
     const [sessId, setSessionId] = useState(sessionId);
@@ -47,7 +49,13 @@ const ChatWidget = ({ isOpen, name, phone, inputFrom, sessionId, sendTrigger, se
             type: 'text'
         };
 
-        dispatch(setChatMessage(Array.isArray(chatMessage) ? [...chatMessage, userMsg] : [userMsg]));
+        const currentMessages = Array.isArray(chatMessage) ? chatMessage : [];
+        const lastMsg = currentMessages[currentMessages.length - 1];
+        const isAlreadyAdded = lastMsg && lastMsg.user === name && lastMsg.text === input;
+
+        if (!isAlreadyAdded) {
+            dispatch(setChatMessage([...currentMessages, userMsg]));
+        }
 
         setTimeout(() => {
             setIsTyping(true);
@@ -137,7 +145,7 @@ const ChatWidget = ({ isOpen, name, phone, inputFrom, sessionId, sendTrigger, se
                                 }}
                             >
                                 <img
-                                    src="mbaksinggah.png"
+                                    src="avatar.jpg"
                                     alt="Bot"
                                     style={{
                                         width: 32,
@@ -229,10 +237,10 @@ const ChatWidget = ({ isOpen, name, phone, inputFrom, sessionId, sendTrigger, se
                                                     cursor: "pointer"
                                                 }}
                                                 onClick={() => {
-                                                    toast.success('Tempat berhasil disimpan!');
+                                                    toast.success(t('chat.saved'));
                                                 }}
                                             >
-                                                Simpan
+                                                {t('chat.save')}
                                             </button>
                                         </div>
                                     ))}
@@ -265,7 +273,7 @@ const ChatWidget = ({ isOpen, name, phone, inputFrom, sessionId, sendTrigger, se
                             <span></span>
                             <span></span>
                         </div>
-                        <span>Mbak Singgah sedang mengetik...</span>
+                        <span>{t('chat.typing')}</span>
                     </div>
                 )}
 
@@ -280,7 +288,7 @@ const ChatWidget = ({ isOpen, name, phone, inputFrom, sessionId, sendTrigger, se
                         backgroundColor: isTyping ? '#f5f5f5' : '#fff',
                         color: isTyping ? '#999' : '#444'
                     }}
-                    placeholder={isTyping ? "Menunggu respons..." : "Tanya Mbak Singgah..."}
+                    placeholder={isTyping ? t('chat.waiting') : t('chat.placeholder')}
                     rows={1}
                     disabled={isTyping}
                     onKeyDown={(e) => {
