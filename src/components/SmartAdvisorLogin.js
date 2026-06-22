@@ -119,23 +119,37 @@ const SmartAdvisorLogin = ({ isOpen }) => {
     if (!isOpen) return null;
 
     return (
-        <div style={widgetStyles.container}>
+        <Box
+            className="chat-container-mobile"
+            sx={{
+                position: { xs: 'fixed', sm: 'fixed' },
+                top: { xs: 0, sm: 'auto' },
+                left: { xs: 0, sm: 'auto' },
+                right: { xs: 'auto', sm: '20px' },
+                bottom: { xs: 0, sm: '80px' },
+                width: { xs: '100%', sm: '380px' },
+                height: { xs: '100vh', sm: '600px' },
+                maxWidth: { xs: '100%', sm: '380px' },
+                maxHeight: { xs: '100vh', sm: '90vh' },
+                backgroundColor: '#f1f1f1',
+                borderRadius: { xs: 0, sm: '10px' },
+                boxShadow: { xs: 'none', sm: '0 2px 10px rgba(0,0,0,0.2)' },
+                zIndex: 999,
+                display: 'flex',
+                flexDirection: 'column',
+                overflow: 'hidden',
+            }}
+        >
             <Box
                 sx={{
-                    width: { xs: '100%', sm: '90%', md: '100%' },
-                    height: { xs: '100vh', sm: 'auto' },
-                    maxHeight: { xs: '100vh', sm: '90vh' },
-                    maxWidth: { xs: '100%', sm: 620 },
+                    width: '100%',
+                    height: '100%',
                     background: '#EFEFEF',
-                    border: { xs: 'none', sm: '1.5px solid #e0e0e0' },
-                    boxShadow: { xs: 'none', sm: '0 4px 24px rgba(0,0,0,0.10)' },
-                    borderRadius: { xs: 0, sm: 2 },
                     overflow: 'hidden',
                     display: 'flex',
                     flexDirection: 'column',
                     alignItems: 'stretch',
                     fontFamily: 'Rubik, Arial, sans-serif',
-                    position: { xs: 'relative', sm: 'static' },
                 }}
             >
                 {isSuccess && chatMessage.length === 0 ? (
@@ -478,24 +492,11 @@ const SmartAdvisorLogin = ({ isOpen }) => {
                     </div>
                 )}
             </Box>
-        </div>
+        </Box>
     );
 };
 
 const widgetStyles = {
-    container: {
-        position: 'fixed',
-        bottom: '80px',
-        right: '20px',
-        width: '380px',
-        height: '600px',
-        backgroundColor: '#f1f1f1',
-        borderRadius: '10px',
-        boxShadow: '0 2px 10px rgba(0,0,0,0.2)',
-        zIndex: 999,
-        display: 'flex',
-        flexDirection: 'column',
-    },
     containerLoading: {
         display: 'flex',
         justifyContent: 'center',

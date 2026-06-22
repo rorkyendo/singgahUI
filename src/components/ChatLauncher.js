@@ -1,9 +1,9 @@
 import React from 'react';
-import { FaRegComments, FaTimes } from "react-icons/fa";
+import { FaTimes } from "react-icons/fa";
 
 const ChatLauncher = ({ isOpen, toggleChat }) => {
     return (
-        <button onClick={toggleChat} style={launcherStyles}>
+        <button className="chat-launcher" onClick={toggleChat} style={launcherStyles}>
             {isOpen ?
                 <FaTimes style={launcherIcon} /> :
                 <img src="lc_icon.png" alt="Chat Icon" style={{ width: '40px', height: '40px' }} />
@@ -26,7 +26,7 @@ const launcherStyles = {
     WebkitTapHighlightColor: 'transparent',
     touchAction: 'manipulation',
     minWidth: '44px',
-    minHeight: '44px'
+    minHeight: '44px',
 };
 
 const launcherIcon = {
