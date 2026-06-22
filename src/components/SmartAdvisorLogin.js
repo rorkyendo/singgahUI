@@ -6,7 +6,6 @@ import {
     CircularProgress,
     FormControl,
     InputAdornment,
-    InputLabel,
     OutlinedInput,
     Typography,
     Slider,
@@ -357,57 +356,81 @@ const SmartAdvisorLogin = ({ isOpen }) => {
                             <div dangerouslySetInnerHTML={{ __html: subTitle }} />
                             <form onSubmit={handleSubmit(onSubmit)}>
                                 <FormControl fullWidth sx={{ marginTop: { xs: 2, sm: 4 } }}>
-                                    <InputLabel htmlFor="outlined-adornment-name">Nama Lengkap</InputLabel>
+                                    <Typography sx={{ fontSize: 12, fontWeight: 600, color: '#64748b', mb: 0.5, textAlign: 'left' }}>
+                                        Nama Lengkap
+                                    </Typography>
                                     <OutlinedInput
                                         id="outlined-adornment-name"
                                         value={name}
-                                        startAdornment={<InputAdornment position="start"><FaUser /></InputAdornment>}
-                                        label="Nama Lengkap"
+                                        startAdornment={<InputAdornment position="start"><FaUser style={{ color: '#16a34a' }} /></InputAdornment>}
+                                        placeholder="Masukkan nama lengkap"
                                         size="small"
                                         required
                                         readOnly={readOnly}
                                         onChange={e => setName(e.target.value)}
+                                        sx={{
+                                            backgroundColor: '#f8fafc',
+                                            borderRadius: '12px',
+                                            '& fieldset': { borderColor: '#e2e8f0' },
+                                            '&:hover fieldset': { borderColor: '#16a34a' },
+                                            '&.Mui-focused fieldset': { borderColor: '#16a34a' },
+                                        }}
                                     />
                                 </FormControl>
 
                                 <FormControl fullWidth sx={{ marginTop: { xs: 2, sm: 3 } }}>
-                                    <InputLabel htmlFor="outlined-adornment-phone">Nomor HP</InputLabel>
+                                    <Typography sx={{ fontSize: 12, fontWeight: 600, color: '#64748b', mb: 0.5, textAlign: 'left' }}>
+                                        Nomor HP
+                                    </Typography>
                                     <OutlinedInput
                                         id="outlined-adornment-phone"
                                         value={phone}
-                                        startAdornment={<InputAdornment position="start"><FaMobileAlt /></InputAdornment>}
-                                        label="Nomor HP"
+                                        startAdornment={<InputAdornment position="start"><FaMobileAlt style={{ color: '#16a34a' }} /></InputAdornment>}
+                                        placeholder="Masukkan nomor HP"
                                         size="small"
                                         required
                                         readOnly={readOnly}
                                         onChange={handleChangeNumber}
+                                        sx={{
+                                            backgroundColor: '#f8fafc',
+                                            borderRadius: '12px',
+                                            '& fieldset': { borderColor: '#e2e8f0' },
+                                            '&:hover fieldset': { borderColor: '#16a34a' },
+                                            '&.Mui-focused fieldset': { borderColor: '#16a34a' },
+                                        }}
                                     />
                                 </FormControl>
 
-                                <FormControl fullWidth sx={{ marginTop: 3 }}>
-                                    <InputLabel htmlFor="status-pernikahan" shrink={statusPernikahan !== ''}>
+                                <FormControl fullWidth sx={{ marginTop: { xs: 2, sm: 3 } }}>
+                                    <Typography sx={{ fontSize: 12, fontWeight: 600, color: '#64748b', mb: 0.5, textAlign: 'left' }}>
                                         Status Pernikahan
-                                    </InputLabel>
+                                    </Typography>
                                     <Select
                                         id="status-pernikahan"
                                         value={statusPernikahan}
-                                        label="Status Pernikahan"
                                         size="small"
                                         required
                                         disabled={readOnly}
                                         displayEmpty
-                                        renderValue={(selected) => selected ? selected.charAt(0).toUpperCase() + selected.slice(1) : 'Pilih'}
+                                        renderValue={(selected) => selected ? selected.charAt(0).toUpperCase() + selected.slice(1) : 'Pilih status'}
                                         onChange={e => setStatusPernikahan(e.target.value)}
-                                        startAdornment={<InputAdornment position="start"><FaUser /></InputAdornment>}
+                                        startAdornment={<InputAdornment position="start"><FaUser style={{ color: '#16a34a' }} /></InputAdornment>}
+                                        sx={{
+                                            backgroundColor: '#f8fafc',
+                                            borderRadius: '12px',
+                                            '& fieldset': { borderColor: '#e2e8f0' },
+                                            '&:hover fieldset': { borderColor: '#16a34a' },
+                                            '&.Mui-focused fieldset': { borderColor: '#16a34a' },
+                                        }}
                                     >
                                         <MenuItem value="lajang">Lajang</MenuItem>
                                         <MenuItem value="menikah">Menikah</MenuItem>
                                     </Select>
                                 </FormControl>
 
-                                <FormControl fullWidth sx={{ marginTop: 3 }}>
-                                    <Typography gutterBottom sx={{ textAlign: 'left', fontSize: 14, color: '#666' }}>
-                                        <FaMoneyBillWave style={{ marginRight: 8, verticalAlign: 'middle' }} />
+                                <FormControl fullWidth sx={{ marginTop: { xs: 2, sm: 3 } }}>
+                                    <Typography sx={{ fontSize: 12, fontWeight: 600, color: '#64748b', mb: 0.5, textAlign: 'left' }}>
+                                        <FaMoneyBillWave style={{ marginRight: 6, verticalAlign: 'middle', color: '#16a34a' }} />
                                         Range Budget per Bulan: {formatRupiah(budgetMin)} - {formatRupiah(budgetMax)}
                                     </Typography>
                                     <Slider
@@ -433,18 +456,26 @@ const SmartAdvisorLogin = ({ isOpen }) => {
                                     </Box>
                                 </FormControl>
 
-                                <FormControl fullWidth sx={{ marginTop: 3 }}>
-                                    <InputLabel htmlFor="outlined-adornment-lokasi">Lokasi yang Dicari</InputLabel>
+                                <FormControl fullWidth sx={{ marginTop: { xs: 2, sm: 3 } }}>
+                                    <Typography sx={{ fontSize: 12, fontWeight: 600, color: '#64748b', mb: 0.5, textAlign: 'left' }}>
+                                        Lokasi yang Dicari
+                                    </Typography>
                                     <OutlinedInput
                                         id="outlined-adornment-lokasi"
                                         value={lokasi}
-                                        startAdornment={<InputAdornment position="start"><FaMapMarkerAlt /></InputAdornment>}
-                                        label="Lokasi yang Dicari"
+                                        startAdornment={<InputAdornment position="start"><FaMapMarkerAlt style={{ color: '#16a34a' }} /></InputAdornment>}
+                                        placeholder="Contoh: Jakarta Selatan, Bandung, dll"
                                         size="small"
                                         required
                                         readOnly={readOnly}
-                                        placeholder="Contoh: Jakarta Selatan, Bandung, dll"
                                         onChange={e => setLokasi(e.target.value)}
+                                        sx={{
+                                            backgroundColor: '#f8fafc',
+                                            borderRadius: '12px',
+                                            '& fieldset': { borderColor: '#e2e8f0' },
+                                            '&:hover fieldset': { borderColor: '#16a34a' },
+                                            '&.Mui-focused fieldset': { borderColor: '#16a34a' },
+                                        }}
                                     />
                                 </FormControl>
 
