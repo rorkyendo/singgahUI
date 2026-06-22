@@ -144,7 +144,8 @@ const SmartAdvisorLogin = ({ isOpen }) => {
                     width: '100%',
                     height: '100%',
                     background: '#EFEFEF',
-                    overflow: 'hidden',
+                    overflowY: 'auto',
+                    overflowX: 'hidden',
                     display: 'flex',
                     flexDirection: 'column',
                     alignItems: 'stretch',
@@ -415,6 +416,17 @@ const SmartAdvisorLogin = ({ isOpen }) => {
                                         renderValue={(selected) => selected ? selected.charAt(0).toUpperCase() + selected.slice(1) : 'Pilih status'}
                                         onChange={e => setStatusPernikahan(e.target.value)}
                                         startAdornment={<InputAdornment position="start"><FaUser style={{ color: '#16a34a' }} /></InputAdornment>}
+                                        MenuProps={{
+                                            disableScrollLock: true,
+                                            PaperProps: {
+                                                sx: {
+                                                    zIndex: 10000,
+                                                    boxShadow: '0 8px 24px rgba(0,0,0,0.15)',
+                                                    borderRadius: '12px',
+                                                    mt: 0.5,
+                                                }
+                                            }
+                                        }}
                                         sx={{
                                             backgroundColor: '#f8fafc',
                                             borderRadius: '12px',
