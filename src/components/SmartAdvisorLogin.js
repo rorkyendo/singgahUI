@@ -385,7 +385,9 @@ const SmartAdvisorLogin = ({ isOpen }) => {
                                 </FormControl>
 
                                 <FormControl fullWidth sx={{ marginTop: 3 }}>
-                                    <InputLabel htmlFor="status-pernikahan">Status Pernikahan</InputLabel>
+                                    <InputLabel htmlFor="status-pernikahan" shrink={statusPernikahan !== ''}>
+                                        Status Pernikahan
+                                    </InputLabel>
                                     <Select
                                         id="status-pernikahan"
                                         value={statusPernikahan}
@@ -393,10 +395,11 @@ const SmartAdvisorLogin = ({ isOpen }) => {
                                         size="small"
                                         required
                                         disabled={readOnly}
+                                        displayEmpty
+                                        renderValue={(selected) => selected ? selected.charAt(0).toUpperCase() + selected.slice(1) : 'Pilih'}
                                         onChange={e => setStatusPernikahan(e.target.value)}
                                         startAdornment={<InputAdornment position="start"><FaUser /></InputAdornment>}
                                     >
-                                        <MenuItem value="">Pilih</MenuItem>
                                         <MenuItem value="lajang">Lajang</MenuItem>
                                         <MenuItem value="menikah">Menikah</MenuItem>
                                     </Select>
