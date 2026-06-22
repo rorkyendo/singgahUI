@@ -145,7 +145,7 @@ const ChatWidget = ({ isOpen, name, phone, inputFrom, sessionId, sendTrigger, se
                                 }}
                             >
                                 <img
-                                    src="avatar.jpg"
+                                    src="avatar.svg"
                                     alt="Bot"
                                     style={{
                                         width: 32,

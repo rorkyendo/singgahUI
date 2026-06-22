@@ -6,7 +6,7 @@ const ChatLauncher = ({ isOpen, toggleChat }) => {
         <button className="chat-launcher" onClick={toggleChat} style={launcherStyles}>
             {isOpen ?
                 <FaTimes style={launcherIcon} /> :
-                <img src="lc_icon.png" alt="Chat Icon" style={{ width: '40px', height: '40px' }} />
+                <img src="lc_icon.svg" alt="Chat Icon" style={{ width: '40px', height: '40px' }} />
             }
         </button>
     );

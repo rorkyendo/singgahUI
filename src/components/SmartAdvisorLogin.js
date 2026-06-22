@@ -206,7 +206,7 @@ const SmartAdvisorLogin = ({ isOpen }) => {
                         m: 0,
                     }}>
                         <Box sx={{ width: '100%', position: 'relative' }}>
-                            <img src="bgDashboard.jpg" alt="Dashboard" style={{ width: '100%', borderTopLeftRadius: 8, borderTopRightRadius: 8 }} />
+                            <img src="bgDashboard.svg" alt="Dashboard" style={{ width: '100%', borderTopLeftRadius: 8, borderTopRightRadius: 8 }} />
                         </Box>
                         <Box sx={{ px: { xs: 1.5, sm: 2 }, py: 1, width: '100%' }}>
                             <Typography sx={{ fontSize: { xs: 12, sm: 13 }, color: '#4B5563', mb: 0.5, textAlign: 'center' }}>
@@ -256,7 +256,7 @@ const SmartAdvisorLogin = ({ isOpen }) => {
                                     onClick={() => handleQuickSend(t('quickSend.recommendation'))}
                                 >
                                     <img
-                                        src="recom.jpg"
+                                        src="recom.svg"
                                         alt="Recommendation"
                                         style={{
                                             width: '100%',
@@ -328,7 +328,7 @@ const SmartAdvisorLogin = ({ isOpen }) => {
                                     onClick={() => handleQuickSend(getConsultationText())}
                                 >
                                     <img
-                                        src="consult.jpg"
+                                        src="consult.svg"
                                         alt="Consultation"
                                         style={{
                                             width: '100%',
