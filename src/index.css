@@ -65,6 +65,16 @@ body.chat-open {
   height: 100%;
 }
 
+/* Flat select custom styling */
+.flat-select:hover {
+  border-color: #16a34a !important;
+}
+
+.flat-select:focus {
+  border-color: #16a34a !important;
+  box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.1);
+}
+
 @keyframes typing {
   0%, 20% {
     transform: scale(1);

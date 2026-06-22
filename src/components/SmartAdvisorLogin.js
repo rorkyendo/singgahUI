@@ -8,9 +8,7 @@ import {
     InputAdornment,
     OutlinedInput,
     Typography,
-    Slider,
-    Select,
-    MenuItem
+    Slider
 } from '@mui/material';
 import Grid2 from '@mui/material/Grid2';
 import { FaUser, FaMobileAlt, FaMapMarkerAlt, FaMoneyBillWave } from "react-icons/fa";
@@ -406,38 +404,40 @@ const SmartAdvisorLogin = ({ isOpen }) => {
                                     <Typography sx={{ fontSize: 12, fontWeight: 600, color: '#64748b', mb: 0.5, textAlign: 'left' }}>
                                         Status Pernikahan
                                     </Typography>
-                                    <Select
-                                        id="status-pernikahan"
-                                        value={statusPernikahan}
-                                        size="small"
-                                        required
-                                        disabled={readOnly}
-                                        displayEmpty
-                                        renderValue={(selected) => selected ? selected.charAt(0).toUpperCase() + selected.slice(1) : 'Pilih status'}
-                                        onChange={e => setStatusPernikahan(e.target.value)}
-                                        startAdornment={<InputAdornment position="start"><FaUser style={{ color: '#16a34a' }} /></InputAdornment>}
-                                        MenuProps={{
-                                            disableScrollLock: true,
-                                            PaperProps: {
-                                                sx: {
-                                                    zIndex: 10000,
-                                                    boxShadow: '0 8px 24px rgba(0,0,0,0.15)',
-                                                    borderRadius: '12px',
-                                                    mt: 0.5,
-                                                }
-                                            }
-                                        }}
-                                        sx={{
-                                            backgroundColor: '#f8fafc',
-                                            borderRadius: '12px',
-                                            '& fieldset': { borderColor: '#e2e8f0' },
-                                            '&:hover fieldset': { borderColor: '#16a34a' },
-                                            '&.Mui-focused fieldset': { borderColor: '#16a34a' },
-                                        }}
-                                    >
-                                        <MenuItem value="lajang">Lajang</MenuItem>
-                                        <MenuItem value="menikah">Menikah</MenuItem>
-                                    </Select>
+                                    <Box sx={{ position: 'relative' }}>
+                                        <Box sx={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: '#16a34a', pointerEvents: 'none' }}>
+                                            <FaUser />
+                                        </Box>
+                                        <select
+                                            id="status-pernikahan"
+                                            className="flat-select"
+                                            value={statusPernikahan}
+                                            required
+                                            disabled={readOnly}
+                                            onChange={e => setStatusPernikahan(e.target.value)}
+                                            style={{
+                                                width: '100%',
+                                                padding: '10.5px 36px 10.5px 40px',
+                                                backgroundColor: '#f8fafc',
+                                                border: '1px solid #e2e8f0',
+                                                borderRadius: '12px',
+                                                fontSize: 14,
+                                                color: statusPernikahan ? '#222' : '#94a3b8',
+                                                appearance: 'none',
+                                                WebkitAppearance: 'none',
+                                                MozAppearance: 'none',
+                                                outline: 'none',
+                                                cursor: 'pointer',
+                                            }}
+                                        >
+                                            <option value="">Pilih status</option>
+                                            <option value="lajang">Lajang</option>
+                                            <option value="menikah">Menikah</option>
+                                        </select>
+                                        <Box sx={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', color: '#64748b', pointerEvents: 'none', fontSize: 12 }}>
+                                            ▼
+                                        </Box>
+                                    </Box>
                                 </FormControl>
 
                                 <FormControl fullWidth sx={{ marginTop: { xs: 2, sm: 3 } }}>
