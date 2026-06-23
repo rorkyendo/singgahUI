@@ -11,7 +11,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import '@fontsource/rubik';
 
 const ChatWidget = ({ isOpen, name, phone, inputFrom, sessionId, sendTrigger, setSendTrigger }) => {
-    const { t } = useLanguage();
+    const { t, lang } = useLanguage();
     const { chatMessage } = useSelector((state) => state.chat);
     const [input, setInput] = useState(inputFrom);
     const [isTyping, setIsTyping] = useState(false);
@@ -43,7 +43,7 @@ const ChatWidget = ({ isOpen, name, phone, inputFrom, sessionId, sendTrigger, se
             setIsTyping(true);
         }, 300);
 
-        sendChat(sessionId, input).then((response) => {
+        sendChat(sessionId, input, lang).then((response) => {
             setTimeout(() => {
                 setIsTyping(false);
 

@@ -1,7 +1,7 @@
 import axios from "axios";
 import { api_url } from '../utils/const';
 
-export const sendChat = async (sessionId, message) => {
+export const sendChat = async (sessionId, message, language = "id") => {
     try {
         const response = await axios.post(
             `${api_url}message/send`,
@@ -10,7 +10,8 @@ export const sendChat = async (sessionId, message) => {
                 "session": sessionId,
                 "message": message,
                 "read": "N",
-                "replied": "N"
+                "replied": "N",
+                "language": language
             },
             { headers: { "ngrok-skip-browser-warning": "true" } }
         );
