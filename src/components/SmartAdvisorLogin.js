@@ -8,13 +8,13 @@ import {
     InputAdornment,
     OutlinedInput,
     Typography,
-    Slider
 } from '@mui/material';
 import Grid2 from '@mui/material/Grid2';
 import { FaUser, FaMobileAlt, FaMapMarkerAlt, FaMoneyBillWave, FaLocationArrow } from "react-icons/fa";
 import { getDeviceLocation } from '../utils/location';
 import { useForm } from 'react-hook-form';
 import ChatWidget from "./ChatWidget";
+import PrivacyPolicyModal from "./PrivacyPolicyModal";
 import { getUsers, registUser } from "../api/users";
 import '@fontsource/rubik';
 import { useSelector, useDispatch } from "react-redux";
@@ -35,6 +35,7 @@ const SmartAdvisorLogin = ({ isOpen }) => {
     const [budgetMax, setBudgetMax] = useState(3000000);
     const [lokasi, setLokasi] = useState('');
     const [termCondition, setChecked] = useState(false);
+    const [privacyOpen, setPrivacyOpen] = useState(false);
     const [isRegistered, setIsRegistered] = useState(false);
     const [isSave, setIsSave] = useState(false);
     const [isSuccess, setIsSuccess] = useState(false);
@@ -92,9 +93,14 @@ const SmartAdvisorLogin = ({ isOpen }) => {
         setChecked(e.target.checked);
     };
 
-    const handleBudgetChange = (event, newValue) => {
-        setBudgetMin(newValue[0]);
-        setBudgetMax(newValue[1]);
+    const handleBudgetMinChange = (e) => {
+        const raw = e.target.value.replace(/\D/g, '');
+        setBudgetMin(raw === '' ? 0 : parseInt(raw, 10));
+    };
+
+    const handleBudgetMaxChange = (e) => {
+        const raw = e.target.value.replace(/\D/g, '');
+        setBudgetMax(raw === '' ? 0 : parseInt(raw, 10));
     };
 
     const handleDetectLocation = async () => {
@@ -482,33 +488,56 @@ const SmartAdvisorLogin = ({ isOpen }) => {
                                     </Box>
                                 </FormControl>
 
-                                <FormControl fullWidth sx={{ marginTop: { xs: 2, sm: 3 } }}>
-                                    <Typography sx={{ fontSize: 12, fontWeight: 600, color: '#64748b', mb: 0.5, textAlign: 'left' }}>
+                                <Box sx={{ marginTop: { xs: 2, sm: 3 } }}>
+                                    <Typography sx={{ fontSize: 12, fontWeight: 600, color: '#64748b', mb: 1, textAlign: 'left' }}>
                                         <FaMoneyBillWave style={{ marginRight: 6, verticalAlign: 'middle', color: '#16a34a' }} />
-                                        {t('form.budgetRange')}: {formatRupiah(budgetMin)} - {formatRupiah(budgetMax)}
+                                        {t('form.budgetRange')}
                                     </Typography>
-                                    <Slider
-                                        value={[budgetMin, budgetMax]}
-                                        onChange={handleBudgetChange}
-                                        valueLabelDisplay="auto"
-                                        valueLabelFormat={formatRupiah}
-                                        min={300000}
-                                        max={20000000}
-                                        step={100000}
-                                        disabled={readOnly}
-                                        sx={{
-                                            color: '#16a34a',
-                                            '& .MuiSlider-thumb': {
-                                                height: 20,
-                                                width: 20,
-                                            },
-                                        }}
-                                    />
-                                    <Box sx={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, color: '#999' }}>
-                                        <span>{formatCurrency(300000, lang)}</span>
-                                        <span>{formatCurrency(20000000, lang)}</span>
+                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                        <FormControl sx={{ flex: 1 }}>
+                                            <Typography sx={{ fontSize: 11, color: '#94a3b8', mb: 0.5 }}>Min</Typography>
+                                            <OutlinedInput
+                                                value={budgetMin || ''}
+                                                onChange={handleBudgetMinChange}
+                                                disabled={readOnly}
+                                                placeholder="500000"
+                                                startAdornment={<InputAdornment position="start"><span style={{ fontSize: 12, color: '#16a34a', fontWeight: 600 }}>Rp</span></InputAdornment>}
+                                                sx={{
+                                                    fontSize: 13,
+                                                    '& .MuiOutlinedInput-notchedOutline': { borderColor: '#16a34a' },
+                                                    '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: '#16a34a' },
+                                                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#16a34a' },
+                                                    height: 42,
+                                                }}
+                                                inputProps={{ inputMode: 'numeric' }}
+                                            />
+                                        </FormControl>
+                                        <Box sx={{ color: '#94a3b8', fontWeight: 700, mt: 2.5, flexShrink: 0 }}>—</Box>
+                                        <FormControl sx={{ flex: 1 }}>
+                                            <Typography sx={{ fontSize: 11, color: '#94a3b8', mb: 0.5 }}>Max</Typography>
+                                            <OutlinedInput
+                                                value={budgetMax || ''}
+                                                onChange={handleBudgetMaxChange}
+                                                disabled={readOnly}
+                                                placeholder="3000000"
+                                                startAdornment={<InputAdornment position="start"><span style={{ fontSize: 12, color: '#16a34a', fontWeight: 600 }}>Rp</span></InputAdornment>}
+                                                sx={{
+                                                    fontSize: 13,
+                                                    '& .MuiOutlinedInput-notchedOutline': { borderColor: '#16a34a' },
+                                                    '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: '#16a34a' },
+                                                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#16a34a' },
+                                                    height: 42,
+                                                }}
+                                                inputProps={{ inputMode: 'numeric' }}
+                                            />
+                                        </FormControl>
                                     </Box>
-                                </FormControl>
+                                    {budgetMin > 0 && budgetMax > 0 && (
+                                        <Typography sx={{ fontSize: 11, color: '#16a34a', mt: 0.5, textAlign: 'center' }}>
+                                            {formatRupiah(budgetMin)} — {formatRupiah(budgetMax)} /bulan
+                                        </Typography>
+                                    )}
+                                </Box>
 
                                 <FormControl fullWidth sx={{ marginTop: { xs: 2, sm: 3 } }}>
                                     <Typography sx={{ fontSize: 12, fontWeight: 600, color: '#64748b', mb: 0.5, textAlign: 'left' }}>
@@ -565,11 +594,20 @@ const SmartAdvisorLogin = ({ isOpen }) => {
                                         <Checkbox {...register("termscondition")} {...label} sx={{ paddingX: 0, paddingY: 2 }} onChange={handleChangeCheckbox} />
                                     </Grid2>
                                     <Grid2 size={10}>
-                                        <p style={{ fontWeight: 'normal', textAlign: 'justify', fontSize: '15px' }}>
-                                            {t('form.terms')}
+                                        <p style={{ fontWeight: 'normal', textAlign: 'justify', fontSize: '13px', lineHeight: 1.5 }}>
+                                            {t('form.terms')}{' '}
+                                            <span
+                                                onClick={() => setPrivacyOpen(true)}
+                                                style={{ color: '#16a34a', fontWeight: 600, textDecoration: 'underline', cursor: 'pointer' }}
+                                            >
+                                                {t('form.termsLink')}
+                                            </span>
+                                            {' '}{t('form.termsSuffix')}
                                         </p>
                                     </Grid2>
                                 </Grid2>
+
+                                <PrivacyPolicyModal isOpen={privacyOpen} onClose={() => setPrivacyOpen(false)} />
 
                                 <Button
                                     fullWidth

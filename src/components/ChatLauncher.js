@@ -6,7 +6,7 @@ const ChatLauncher = ({ isOpen, toggleChat }) => {
         <button className="chat-launcher" onClick={toggleChat} style={launcherStyles}>
             {isOpen ?
                 <FaTimes style={launcherIcon} /> :
-                <img src="lc_icon.svg" alt="Chat Icon" style={{ width: '40px', height: '40px' }} />
+                <img src="avatar.jpg" alt="Mbok Yem" style={{ width: '44px', height: '44px', borderRadius: '50%', objectFit: 'cover', objectPosition: 'top' }} />
             }
         </button>
     );
@@ -16,11 +16,11 @@ const launcherStyles = {
     position: 'fixed',
     bottom: '20px',
     right: '20px',
-    padding: '10px 12px',
+    padding: '4px',
     backgroundColor: "#FFFFFF",
     color: 'white',
     border: 'solid 2px #007200',
-    borderRadius: '50px',
+    borderRadius: '50%',
     cursor: 'pointer',
     zIndex: 1000,
     WebkitTapHighlightColor: 'transparent',

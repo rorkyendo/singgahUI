@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { FaPaperPlane } from "react-icons/fa";
 import { useLanguage } from '../i18n';
-import { sendChat, getPropertyDetail } from "../api/chat";
+import { sendChat, getPropertyDetail, saveProperty } from "../api/chat";
 import { useDispatch } from 'react-redux';
 import { setChatMessage } from '../store/chatSlice';
 import { store } from '../store';
@@ -15,7 +15,8 @@ const ChatWidget = ({ isOpen, name, phone, inputFrom, sessionId, sendTrigger, se
     const { chatMessage } = useSelector((state) => state.chat);
     const [input, setInput] = useState(inputFrom);
     const [isTyping, setIsTyping] = useState(false);
-    const [detailModal, setDetailModal] = useState({ open: false, item: null, images: [], description: '', loading: false, activeIndex: 0 });
+    const [savingId, setSavingId] = useState(null);
+    const [detailModal, setDetailModal] = useState({ open: false, item: null, images: [], description: '', loading: false, activeIndex: 0, bedrooms: 0, bathrooms: 0, land_area: 0, building_area: 0, facilities: [] });
     const dispatch = useDispatch();
     const messagesEndRef = useRef(null);
 
@@ -97,7 +98,7 @@ const ChatWidget = ({ isOpen, name, phone, inputFrom, sessionId, sendTrigger, se
 
     const openDetail = async (item) => {
         if (!item.url || !item.sumber) return;
-        setDetailModal({ open: true, item, images: [], description: '', loading: true, activeIndex: 0 });
+        setDetailModal({ open: true, item, images: [], description: '', loading: true, activeIndex: 0, bedrooms: 0, bathrooms: 0, land_area: 0, building_area: 0, facilities: [] });
         try {
             const data = await getPropertyDetail(item.url, item.sumber);
             const images = Array.isArray(data.images) ? data.images : [];
@@ -108,13 +109,18 @@ const ChatWidget = ({ isOpen, name, phone, inputFrom, sessionId, sendTrigger, se
                 description,
                 loading: false,
                 activeIndex: 0,
+                bedrooms: data.bedrooms || 0,
+                bathrooms: data.bathrooms || 0,
+                land_area: data.land_area || 0,
+                building_area: data.building_area || 0,
+                facilities: Array.isArray(data.facilities) ? data.facilities : [],
             }));
         } catch (e) {
             setDetailModal(prev => ({ ...prev, loading: false }));
         }
     };
 
-    const closeDetail = () => setDetailModal({ open: false, item: null, images: [], loading: false, activeIndex: 0 });
+    const closeDetail = () => setDetailModal({ open: false, item: null, images: [], description: '', loading: false, activeIndex: 0, bedrooms: 0, bathrooms: 0, land_area: 0, building_area: 0, facilities: [] });
 
     const nextImage = () => {
         setDetailModal(prev => ({
@@ -180,17 +186,19 @@ const ChatWidget = ({ isOpen, name, phone, inputFrom, sessionId, sendTrigger, se
                                 }}
                             >
                                 <img
-                                    src="avatar.svg"
-                                    alt="Bot"
+                                    src="avatar.jpg"
+                                    alt="Mbok Yem"
                                     style={{
-                                        width: 32,
-                                        height: 32,
+                                        width: 36,
+                                        height: 36,
                                         borderRadius: '50%',
                                         objectFit: 'cover',
+                                        objectPosition: 'top',
                                         marginRight: 10,
                                         marginTop: 2,
-                                        border: '1.5px solid #eee',
+                                        border: '2px solid #dcfce7',
                                         background: '#fff',
+                                        flexShrink: 0,
                                     }}
                                 />
                                 <div
@@ -269,7 +277,15 @@ const ChatWidget = ({ isOpen, name, phone, inputFrom, sessionId, sendTrigger, se
                                                         src={item.image}
                                                         alt={item.nama_tempat}
                                                         style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                                                        onError={(e) => { e.target.style.display = 'none'; e.target.parentElement.innerText = '🏠'; e.target.parentElement.style.fontSize = 24; }}
+                                                        onError={(e) => {
+                                                            const target = e.currentTarget || e.target;
+                                                            if (target && target.style) target.style.display = 'none';
+                                                            const parent = target && target.parentElement;
+                                                            if (parent) {
+                                                                parent.innerText = '🏠';
+                                                                parent.style.fontSize = 24;
+                                                            }
+                                                        }}
                                                     />
                                                 ) : '🏠'}
                                             </div>
@@ -290,11 +306,24 @@ const ChatWidget = ({ isOpen, name, phone, inputFrom, sessionId, sendTrigger, se
                                                         cursor: "pointer",
                                                         fontSize: 12,
                                                     }}
-                                                    onClick={() => {
-                                                        toast.success(t('chat.saved'));
+                                                    disabled={savingId === idx + '-' + index}
+                                                    onClick={async () => {
+                                                        setSavingId(idx + '-' + index);
+                                                        try {
+                                                            const res = await saveProperty(sessionId, item);
+                                                            if (res?.rc === '200') {
+                                                                toast.success('✅ Tersimpan! Tim kami akan menghubungi Anda via WhatsApp.');
+                                                            } else {
+                                                                toast.error('Gagal menyimpan, coba lagi.');
+                                                            }
+                                                        } catch {
+                                                            toast.error('Gagal menyimpan, coba lagi.');
+                                                        } finally {
+                                                            setSavingId(null);
+                                                        }
                                                     }}
                                                 >
-                                                    {t('chat.save')}
+                                                    {savingId === idx + '-' + index ? '...' : t('chat.save')}
                                                 </button>
                                                 <button
                                                     style={{
@@ -505,12 +534,56 @@ const ChatWidget = ({ isOpen, name, phone, inputFrom, sessionId, sendTrigger, se
                         </div>
 
                         <div style={{ padding: 16 }}>
-                            <div style={{ fontWeight: 700, fontSize: 16, marginBottom: 6 }}>{detailModal.item.nama_tempat}</div>
-                            <div style={{ fontSize: 14, color: '#16a34a', marginBottom: 4 }}>{detailModal.item.harga}</div>
-                            <div style={{ fontSize: 13, color: '#666', marginBottom: 12 }}>📍 {detailModal.item.lokasi}</div>
-                            <div style={{ fontSize: 13, color: '#444', lineHeight: 1.5, whiteSpace: 'pre-wrap' }}>
-                                {detailModal.loading ? 'Loading detail...' : (detailModal.description || 'No description available.')}
-                            </div>
+                            <div style={{ fontWeight: 700, fontSize: 16, marginBottom: 4 }}>{detailModal.item.nama_tempat}</div>
+                            <div style={{ fontSize: 14, color: '#16a34a', fontWeight: 600, marginBottom: 4 }}>{detailModal.item.harga}</div>
+                            <div style={{ fontSize: 13, color: '#666', marginBottom: 10 }}>📍 {detailModal.item.lokasi}</div>
+                            {!detailModal.loading && (
+                                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 10 }}>
+                                    {detailModal.bedrooms > 0 && (
+                                        <span style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: 8, padding: '3px 10px', fontSize: 12, color: '#15803d' }}>
+                                            � {detailModal.bedrooms} Kamar Tidur
+                                        </span>
+                                    )}
+                                    {detailModal.bathrooms > 0 && (
+                                        <span style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: 8, padding: '3px 10px', fontSize: 12, color: '#15803d' }}>
+                                            🚿 {detailModal.bathrooms} Kamar Mandi
+                                        </span>
+                                    )}
+                                    {detailModal.building_area > 0 && (
+                                        <span style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: 8, padding: '3px 10px', fontSize: 12, color: '#15803d' }}>
+                                            🏠 {detailModal.building_area} m² Bangunan
+                                        </span>
+                                    )}
+                                    {detailModal.land_area > 0 && (
+                                        <span style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: 8, padding: '3px 10px', fontSize: 12, color: '#15803d' }}>
+                                            📐 {detailModal.land_area} m² Tanah
+                                        </span>
+                                    )}
+                                </div>
+                            )}
+                            {!detailModal.loading && detailModal.facilities.length > 0 && (
+                                <div style={{ marginBottom: 10 }}>
+                                    <div style={{ fontSize: 12, fontWeight: 600, color: '#555', marginBottom: 4 }}>Fasilitas</div>
+                                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                                        {detailModal.facilities.map((f, i) => (
+                                            <span key={i} style={{ background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: 6, padding: '2px 8px', fontSize: 11, color: '#374151' }}>
+                                                {f}
+                                            </span>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+                            {(detailModal.loading || detailModal.description) && (
+                                <div>
+                                    <div style={{ fontSize: 12, fontWeight: 600, color: '#555', marginBottom: 4 }}>Deskripsi</div>
+                                    <div style={{ fontSize: 13, color: '#444', lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>
+                                        {detailModal.loading ? 'Loading detail...' : detailModal.description}
+                                    </div>
+                                </div>
+                            )}
+                            {!detailModal.loading && !detailModal.description && detailModal.facilities.length === 0 && detailModal.bedrooms === 0 && (
+                                <div style={{ fontSize: 13, color: '#999', textAlign: 'center', padding: '12px 0' }}>Tidak ada detail tersedia.</div>
+                            )}
                         </div>
                     </div>
                 </div>
