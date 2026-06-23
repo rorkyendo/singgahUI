@@ -21,3 +21,17 @@ export const sendChat = async (sessionId, message, language = "id") => {
         throw error;
     }
 };
+
+export const getPropertyDetail = async (url, source) => {
+    try {
+        const response = await axios.post(
+            `${api_url}message/property-detail`,
+            { url, source },
+            { headers: { "ngrok-skip-browser-warning": "true" } }
+        );
+        return response.data;
+    } catch (error) {
+        console.error("Error fetching property detail:", error);
+        throw error;
+    }
+};

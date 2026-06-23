@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { FaPaperPlane } from "react-icons/fa";
 import { useLanguage } from '../i18n';
-import { sendChat } from "../api/chat";
+import { sendChat, getPropertyDetail } from "../api/chat";
 import { useDispatch } from 'react-redux';
 import { setChatMessage } from '../store/chatSlice';
 import { store } from '../store';
@@ -15,6 +15,7 @@ const ChatWidget = ({ isOpen, name, phone, inputFrom, sessionId, sendTrigger, se
     const { chatMessage } = useSelector((state) => state.chat);
     const [input, setInput] = useState(inputFrom);
     const [isTyping, setIsTyping] = useState(false);
+    const [detailModal, setDetailModal] = useState({ open: false, item: null, images: [], description: '', loading: false, activeIndex: 0 });
     const dispatch = useDispatch();
     const messagesEndRef = useRef(null);
 
@@ -92,6 +93,41 @@ const ChatWidget = ({ isOpen, name, phone, inputFrom, sessionId, sendTrigger, se
             messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
         }
     }, [chatMessage, isTyping]);
+
+    const openDetail = async (item) => {
+        if (!item.url || !item.sumber) return;
+        setDetailModal({ open: true, item, images: [], description: '', loading: true, activeIndex: 0 });
+        try {
+            const data = await getPropertyDetail(item.url, item.sumber);
+            const images = Array.isArray(data.images) ? data.images : [];
+            const description = data.description || '';
+            setDetailModal(prev => ({
+                ...prev,
+                images,
+                description,
+                loading: false,
+                activeIndex: 0,
+            }));
+        } catch (e) {
+            setDetailModal(prev => ({ ...prev, loading: false }));
+        }
+    };
+
+    const closeDetail = () => setDetailModal({ open: false, item: null, images: [], loading: false, activeIndex: 0 });
+
+    const nextImage = () => {
+        setDetailModal(prev => ({
+            ...prev,
+            activeIndex: prev.images.length ? (prev.activeIndex + 1) % prev.images.length : 0,
+        }));
+    };
+
+    const prevImage = () => {
+        setDetailModal(prev => ({
+            ...prev,
+            activeIndex: prev.images.length ? (prev.activeIndex - 1 + prev.images.length) % prev.images.length : 0,
+        }));
+    };
 
     if (!isOpen) return null;
 
@@ -208,38 +244,66 @@ const ChatWidget = ({ isOpen, name, phone, inputFrom, sessionId, sendTrigger, se
                                             <div style={{
                                                 width: 120,
                                                 height: 80,
-                                                background: 'linear-gradient(135deg, #16a34a 0%, #0d6b2e 100%)',
+                                                background: item.image ? 'transparent' : 'linear-gradient(135deg, #16a34a 0%, #0d6b2e 100%)',
                                                 borderRadius: 8,
                                                 marginBottom: 8,
                                                 display: 'flex',
                                                 alignItems: 'center',
                                                 justifyContent: 'center',
                                                 color: '#fff',
-                                                fontSize: 24,
-                                                fontWeight: 700
+                                                fontSize: item.image ? 0 : 24,
+                                                fontWeight: 700,
+                                                overflow: 'hidden',
                                             }}>
-                                                🏠
+                                                {item.image ? (
+                                                    <img
+                                                        src={item.image}
+                                                        alt={item.nama_tempat}
+                                                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                                        onError={(e) => { e.target.style.display = 'none'; e.target.parentElement.innerText = '🏠'; e.target.parentElement.style.fontSize = 24; }}
+                                                    />
+                                                ) : '🏠'}
                                             </div>
                                             <div style={{ fontWeight: 600, fontSize: 13, marginBottom: 2, textAlign: 'center' }}>{item.nama_tempat}</div>
                                             <div style={{ fontSize: 12, color: "#666", marginBottom: 2 }}>{item.tipe}</div>
                                             <div style={{ fontSize: 12, color: "#222", marginBottom: 2 }}>{item.harga}</div>
                                             <div style={{ fontSize: 12, color: "#16a34a", marginBottom: 6 }}>📍 {item.lokasi}</div>
-                                            <button
-                                                style={{
-                                                    background: "#16a34a",
-                                                    color: "#fff",
-                                                    border: "none",
-                                                    borderRadius: 8,
-                                                    padding: "4px 18px",
-                                                    fontWeight: 600,
-                                                    cursor: "pointer"
-                                                }}
-                                                onClick={() => {
-                                                    toast.success(t('chat.saved'));
-                                                }}
-                                            >
-                                                {t('chat.save')}
-                                            </button>
+                                            <div style={{ display: 'flex', gap: 6, width: '100%' }}>
+                                                <button
+                                                    style={{
+                                                        flex: 1,
+                                                        background: "#16a34a",
+                                                        color: "#fff",
+                                                        border: "none",
+                                                        borderRadius: 8,
+                                                        padding: "4px 8px",
+                                                        fontWeight: 600,
+                                                        cursor: "pointer",
+                                                        fontSize: 12,
+                                                    }}
+                                                    onClick={() => {
+                                                        toast.success(t('chat.saved'));
+                                                    }}
+                                                >
+                                                    {t('chat.save')}
+                                                </button>
+                                                <button
+                                                    style={{
+                                                        flex: 1,
+                                                        background: "#f8fafc",
+                                                        color: "#16a34a",
+                                                        border: "1px solid #16a34a",
+                                                        borderRadius: 8,
+                                                        padding: "4px 8px",
+                                                        fontWeight: 600,
+                                                        cursor: "pointer",
+                                                        fontSize: 12,
+                                                    }}
+                                                    onClick={() => openDetail(item)}
+                                                >
+                                                    Detail
+                                                </button>
+                                            </div>
                                         </div>
                                     ))}
                                 </div>
@@ -308,6 +372,140 @@ const ChatWidget = ({ isOpen, name, phone, inputFrom, sessionId, sendTrigger, se
                     <FaPaperPlane />
                 </button>
             </div>
+            {detailModal.open && detailModal.item && (
+                <div
+                    style={{
+                        position: 'fixed',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        background: 'rgba(0,0,0,0.6)',
+                        zIndex: 2000,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        padding: 16,
+                    }}
+                    onClick={closeDetail}
+                >
+                    <div
+                        style={{
+                            background: '#fff',
+                            borderRadius: 16,
+                            width: '100%',
+                            maxWidth: 420,
+                            maxHeight: '90vh',
+                            overflowY: 'auto',
+                            position: 'relative',
+                        }}
+                        onClick={e => e.stopPropagation()}
+                    >
+                        <button
+                            onClick={closeDetail}
+                            style={{
+                                position: 'absolute',
+                                top: 10,
+                                right: 10,
+                                background: 'rgba(0,0,0,0.5)',
+                                color: '#fff',
+                                border: 'none',
+                                borderRadius: '50%',
+                                width: 32,
+                                height: 32,
+                                cursor: 'pointer',
+                                zIndex: 10,
+                                fontSize: 16,
+                            }}
+                        >
+                            ✕
+                        </button>
+
+                        <div style={{ position: 'relative', width: '100%', height: 220, background: '#f1f1f1' }}>
+                            {detailModal.loading ? (
+                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
+                                    Loading...
+                                </div>
+                            ) : detailModal.images.length > 0 ? (
+                                <>
+                                    <img
+                                        src={detailModal.images[detailModal.activeIndex]}
+                                        alt="Property"
+                                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                    />
+                                    {detailModal.images.length > 1 && (
+                                        <>
+                                            <button
+                                                onClick={prevImage}
+                                                style={{
+                                                    position: 'absolute',
+                                                    left: 10,
+                                                    top: '50%',
+                                                    transform: 'translateY(-50%)',
+                                                    background: 'rgba(0,0,0,0.5)',
+                                                    color: '#fff',
+                                                    border: 'none',
+                                                    borderRadius: '50%',
+                                                    width: 36,
+                                                    height: 36,
+                                                    cursor: 'pointer',
+                                                }}
+                                            >
+                                                ‹
+                                            </button>
+                                            <button
+                                                onClick={nextImage}
+                                                style={{
+                                                    position: 'absolute',
+                                                    right: 10,
+                                                    top: '50%',
+                                                    transform: 'translateY(-50%)',
+                                                    background: 'rgba(0,0,0,0.5)',
+                                                    color: '#fff',
+                                                    border: 'none',
+                                                    borderRadius: '50%',
+                                                    width: 36,
+                                                    height: 36,
+                                                    cursor: 'pointer',
+                                                }}
+                                            >
+                                                ›
+                                            </button>
+                                            <div style={{
+                                                position: 'absolute',
+                                                bottom: 10,
+                                                left: '50%',
+                                                transform: 'translateX(-50%)',
+                                                background: 'rgba(0,0,0,0.5)',
+                                                color: '#fff',
+                                                borderRadius: 12,
+                                                padding: '2px 10px',
+                                                fontSize: 12,
+                                            }}>
+                                                {detailModal.activeIndex + 1} / {detailModal.images.length}
+                                            </div>
+                                        </>
+                                    )}
+                                </>
+                            ) : (
+                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: '#aaa', fontSize: 48 }}>
+                                    🏠
+                                </div>
+                            )}
+                        </div>
+
+                        <div style={{ padding: 16 }}>
+                            <div style={{ fontWeight: 700, fontSize: 16, marginBottom: 6 }}>{detailModal.item.nama_tempat}</div>
+                            <div style={{ fontSize: 14, color: '#16a34a', marginBottom: 4 }}>{detailModal.item.harga}</div>
+                            <div style={{ fontSize: 13, color: '#666', marginBottom: 12 }}>📍 {detailModal.item.lokasi}</div>
+                            <div style={{ fontSize: 13, color: '#444', lineHeight: 1.5, whiteSpace: 'pre-wrap' }}>
+                                {detailModal.loading ? 'Loading detail...' : (detailModal.description || 'No description available.')}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             <ToastContainer position="top-center" autoClose={1500} />
         </>
     );
