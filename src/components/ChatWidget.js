@@ -76,7 +76,7 @@ const ChatWidget = ({ isOpen, name, phone, inputFrom, sessionId, sendTrigger, se
         });
 
         setInput("");
-    }, [input, name, sessionId, chatMessage, dispatch, setIsTyping, setInput]);
+    }, [input, name, sessionId, chatMessage, dispatch, setIsTyping, setInput, lang]);
 
     useEffect(() => {
         if (sendTrigger && input && input.trim() !== "") {
