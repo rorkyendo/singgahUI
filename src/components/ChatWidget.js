@@ -60,7 +60,8 @@ const ChatWidget = ({ isOpen, name, phone, inputFrom, sessionId, sendTrigger, se
                         text: msg,
                         type: 'text',
                         is_product: response.is_product,
-                        product: response.product || []
+                        product: response.product || [],
+                        source_counts: response.source_counts || {}
                     }));
                     const latestMessages = Array.isArray(store.getState().chat.chatMessage)
                         ? store.getState().chat.chatMessage
@@ -210,13 +211,21 @@ const ChatWidget = ({ isOpen, name, phone, inputFrom, sessionId, sendTrigger, se
                                 </div>
                             </div>
                             {isLastBotMsgWithProduct && (
+                                <div style={{ marginLeft: 42, marginBottom: 6 }}>
+                                    {msg.source_counts && Object.keys(msg.source_counts).length > 0 && (
+                                        <div style={{ fontSize: 11, color: '#666', marginBottom: 6, padding: '0 4px' }}>
+                                            {Object.entries(msg.source_counts)
+                                                .filter(([, count]) => count > 0)
+                                                .map(([source, count]) => `${source}: ${count}`)
+                                                .join(' | ')}
+                                        </div>
+                                    )}
                                 <div
                                     style={{
                                         display: 'flex',
                                         gap: 12,
                                         flex: '0 0 auto',
                                         marginBottom: 10,
-                                        marginLeft: 42,
                                         overflowX: 'auto',
                                         overflowY: 'visible',
                                         padding: 8,
@@ -306,6 +315,7 @@ const ChatWidget = ({ isOpen, name, phone, inputFrom, sessionId, sendTrigger, se
                                             </div>
                                         </div>
                                     ))}
+                                </div>
                                 </div>
                             )}
                         </React.Fragment>
